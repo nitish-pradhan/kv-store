@@ -1,16 +1,16 @@
 package io.kvstore.kv_store.model;
 
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
 public class KeyValueRequest {
 
-    @NotBlank
+    @NotEmpty(message = "Key can not be a null or empty")
     private String key;
 
-    @NotBlank
+    @NotEmpty(message = "Key can not be a null or empty")
     private String value;
 
 }
