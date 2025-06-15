@@ -33,6 +33,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(kvErrorResponse, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(KvStorePersistenceException.class)
+    public ResponseEntity<KvErrorResponse> handlePersistenceError(KvStorePersistenceException ex, WebRequest request) {
+        KvErrorResponse error = new KvErrorResponse(
+                request.getDescription(false),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<KvErrorResponse> handleGlobalException(Exception exception,
                                                                  WebRequest webRequest) {
