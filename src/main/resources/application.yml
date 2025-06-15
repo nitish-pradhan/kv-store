@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: kv-store
+    version: 1.0.0
+    logging:
+      level:
+        io.kvstore: DEBUG
+
+kvstore:
+  persistence:
+    path: ./data/rocksdb
+

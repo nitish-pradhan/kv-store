@@ -74,7 +74,7 @@ curl http://localhost:8080/api/v1/store/all
 
 We aim to evolve `kv-store` into a resilient, distributed KV engine:
 
-- [ ] Persistence: File or H2-based storage
+- [ ] Persistence: File based - RocksDB
 - [ ] TTL & Expiry: Auto cleanup of keys
 - [ ] Replication: Primary-replica model
 - [ ] Consensus: RAFT protocol integration

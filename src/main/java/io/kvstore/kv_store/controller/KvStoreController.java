@@ -8,6 +8,7 @@ import io.kvstore.kv_store.model.KvResponse;
 import io.kvstore.kv_store.service.IKeyValueService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.rocksdb.RocksDBException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class KvStoreController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<KeyValueResponse> get(@RequestParam String key) {
+    public ResponseEntity<KeyValueResponse> get(@RequestParam String key) throws RocksDBException {
         log.info("Received request to get key: {}", key);
         KeyValueResponse response = iKeyValueService.get(key).get(); // safe because exception is thrown if not found
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -46,7 +47,7 @@ public class KvStoreController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<KvResponse> delete(@RequestParam String key) {
+    public ResponseEntity<KvResponse> delete(@RequestParam String key) throws RocksDBException {
         log.info("Received request to delete key: {}", key);
         boolean isDeleted = iKeyValueService.delete(key);
         if (isDeleted) {
