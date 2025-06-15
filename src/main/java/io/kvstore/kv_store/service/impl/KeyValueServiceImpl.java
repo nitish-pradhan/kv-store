@@ -1,11 +1,13 @@
 package io.kvstore.kv_store.service.impl;
 
+import io.kvstore.kv_store.exception.KvStorePersistenceException;
 import io.kvstore.kv_store.exception.ResourceNotFoundException;
 import io.kvstore.kv_store.model.KeyValueRequest;
 import io.kvstore.kv_store.model.KeyValueResponse;
 import io.kvstore.kv_store.persistence.RocksDBStore;
 import io.kvstore.kv_store.service.IKeyValueService;
 import io.kvstore.kv_store.store.InMemoryStore;
+import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
@@ -49,4 +51,5 @@ public class KeyValueServiceImpl implements IKeyValueService {
                 .map(entry -> new KeyValueResponse(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
+
 }

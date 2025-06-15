@@ -1,10 +1,14 @@
 package io.kvstore.kv_store.persistence;
 
-import io.kvstore.kv_store.model.KeyValueResponse;
 import io.kvstore.kv_store.exception.KvStorePersistenceException;
+import io.kvstore.kv_store.model.KeyValueResponse;
+import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.rocksdb.*;
+import org.rocksdb.FlushOptions;
+import org.rocksdb.RocksDB;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,7 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @AllArgsConstructor
 public class RocksDBStore {
 
-    private final RocksDB db;
+    private RocksDB db;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
@@ -109,5 +113,37 @@ public class RocksDBStore {
             lock.readLock().unlock();
         }
         return results;
+    }
+
+    /**
+     * Graceful shutdown hook that ensures:
+     * 1. All pending writes are flushed to disk
+     * 2. Database resources are properly closed
+     * 3. Prevents data corruption on application exit
+     */
+    @PreDestroy
+    public void close() {
+        lock.writeLock().lock();
+        try {
+            if (db != null) {
+                try {
+                    // 1. Flush all pending operations
+                    db.flush(new FlushOptions().setWaitForFlush(true));
+
+                    // 2. Close database instance
+                    db.close();
+
+                    // 3. Optionally call static RocksDB shutdown
+                    RocksDB.loadLibrary(); // Ensures native library is loaded
+                    // RocksDB.shutdown(); // Only needed if using multiple instances
+                } catch (RocksDBException e) {
+                    throw new KvStorePersistenceException("Failed to shutdown RocksDB", e);
+                } finally {
+                    db = null;
+                }
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }
