@@ -25,15 +25,11 @@ public class KeyValueServiceImpl implements IKeyValueService {
     @Override
     public void put(KeyValueRequest keyValueRequest) {
         log.debug("Saving key: {}, value: {}", keyValueRequest.getKey(), keyValueRequest.getValue());
-        try {
-            rocksDBStore.put(keyValueRequest.getKey(), keyValueRequest.getValue());
-        } catch (RocksDBException e) {
-            throw new RuntimeException("Failed to persist data", e);
-        }
+        rocksDBStore.put(keyValueRequest.getKey(), keyValueRequest.getValue());
     }
 
     @Override
-    public Optional<KeyValueResponse> get(String key) throws RocksDBException {
+    public Optional<KeyValueResponse> get(String key) {
         log.debug("Retrieving key: {}", key);
         String value = rocksDBStore.get(key)
                 .orElseThrow(() -> new ResourceNotFoundException(key));
@@ -41,7 +37,7 @@ public class KeyValueServiceImpl implements IKeyValueService {
     }
 
     @Override
-    public boolean delete(String key) throws RocksDBException {
+    public boolean delete(String key) {
         log.debug("Deleting key: {}", key);
         return rocksDBStore.delete(key);
     }
